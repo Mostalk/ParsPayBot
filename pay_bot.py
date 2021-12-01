@@ -4,6 +4,7 @@ import threading
 import configparser
 from yoomoney import Client, Quickpay
 
+
 config = configparser.ConfigParser()
 config.read('config.ini')
 bot = telebot.TeleBot(config['pay']['token'], parse_mode="MARKDOWN")

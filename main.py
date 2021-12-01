@@ -16,7 +16,6 @@ bot.start()
 file = open("chats")
 chats = list(map(lambda s: int(s.strip()), file.readlines()))
 markup = [Button.text('Добавить канал'), Button.text('В работе')]
-
 file.close()
 
 
