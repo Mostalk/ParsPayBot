@@ -1,10 +1,13 @@
 import os
 import sys
+import configparser
 
 from telethon import TelegramClient, events, utils, Button
 
-api_id = 3417108
-api_hash = '9da043fc0c92b8e6e4b1a77b9e2baeec'
+config = configparser.ConfigParser()
+config.read('config.ini')
+api_id = int(config['telegram']['api_id'])
+api_hash = config['telegram']['api_hash']
 
 client = TelegramClient('session_name', api_id, api_hash)
 client.start()

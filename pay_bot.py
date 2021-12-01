@@ -1,11 +1,13 @@
 import telebot
 import time
 import threading
+import configparser
 from yoomoney import Client, Quickpay
 
-bot = telebot.TeleBot("2127016903:AAGev4h29ECmkZ7xcTyq2kxG435zYs73KXs", parse_mode="MARKDOWN")
-token = "41001565381812.CD4C81BABB16ABECCC797EC8FAA73F931D050EB817A0DABA66730A17CAF9B02341E07E1E22F8370DE105E5A0B555CAC16DA01C87C6D21BE64FEDE0EF43EA83486BE628B61D18847D28EF9C2768382596691ED4FBCACC723E81D167AF883ED1F3C0913AF7FBCEF9B533877AC9AF2647B96CDF9426BE6ED50D71DE4F6B455ADCE2"
-label = str(time.time())
+config = configparser.ConfigParser()
+config.read('config.ini')
+bot = telebot.TeleBot(config['pay']['token'], parse_mode="MARKDOWN")
+token = label = str(time.time())
 client = Client(token)
 
 
