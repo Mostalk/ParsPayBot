@@ -1,8 +1,11 @@
+import configparser
 import os
 import sys
-import configparser
+import time
 
 from telethon import TelegramClient, events, utils, Button
+from telethon.tl.functions.messages import ExportChatInviteRequest
+from yoomoney import Quickpay, Client
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -17,11 +20,11 @@ file = open("chats")
 chats = list(map(lambda s: int(s.strip()), file.readlines()))
 markup = [Button.text('Добавить канал'), Button.text('В работе')]
 file.close()
+yoo = Client(config['pay']['token'])
 
 
 @bot.on(events.CallbackQuery())
 async def handler_event(event):
-    global chats
     ename = event.data.decode("utf-8")
     if ename == "Добавить":
         mess = await bot.get_messages(event.original_update.user_id, ids=event.original_update.msg_id)
@@ -49,6 +52,34 @@ async def handler_event(event):
 @bot.on(events.NewMessage(incoming=True))
 async def handler_start(event):
     if event.text == "/start":
+        if event.chat_id != 0:
+            label = str(time.time())
+            await bot.send_message(event.chat_id, "Здравствуйте, Вам нужно оплатить доступ к каналу")
+            quickpay = Quickpay(
+                receiver="41001565381812",
+                quickpay_form="shop",
+                targets="Оплата доступа",
+                paymentType="SB",
+                sum=100,
+                label=label
+            )
+            peer = await client.get_input_entity("Test channel")
+            invite = await client(ExportChatInviteRequest(
+                peer=peer,
+                usage_limit=1,
+            ))
+            await bot.send_message(event.chat_id, "Ссылка для опалаты:\n" + quickpay.base_url)
+            print("Checking payment...")
+            history = yoo.operation_history(label=label)
+            while not len(history.operations):
+                time.sleep(2)
+                history = yoo.operation_history(label=label)
+            for operation in history.operations:
+                print()
+                print("Operation:", operation.operation_id)
+                print("\tStatus     -->", operation.status)
+            await bot.send_message(event.chat_id, "Оплата получена\nВаша уникальная ссылка\n" + invite.link)
+
         await bot.send_message(event.chat_id, "Добро пожаловать в бота", buttons=markup)
     if event.text == "Добавить канал":
         async for dialog in client.iter_dialogs():
